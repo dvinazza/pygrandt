@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, MetaData, select, and_
 from sqlalchemy import Table, Column, Integer, String, \
     ForeignKey, UniqueConstraint, Date
 from sqlalchemy.orm import scoped_session, sessionmaker
-from datetime import datetime
+
 
 class Database():
     def __init__(self, echo=False):
@@ -57,6 +57,32 @@ class Database():
                                      Column('jugador_id', Integer,
                                             ForeignKey('jugadores.id')),
                                      Column('cantidad', Integer),
-                                     Column('fecha', Date,
-                                            default=datetime.utcnow))
+                                     Column('fecha', Date))
             self.equipos_gdt.create()
+
+
+def insertarJugador(j):
+    try:
+        j['equipo_id'] = db.session.query(db.equipos).\
+            filter_by(nombre=j['equipo'])[0][0]
+    except:
+        db.equipos.insert({'nombre': j['equipo']}).execute()
+        j['equipo_id'] = db.session.query(db.equipos).\
+            filter_by(nombre=j['equipo'])[0][0]
+
+    try:
+        j['posicion_id'] = db.session.query(db.posiciones).\
+            filter_by(nombre=j['posicion'])[0][0]
+    except:
+        db.posiciones.insert({'nombre': j['posicion']}).execute()
+        j['posicion_id'] = db.session.query(db.posiciones).\
+            filter_by(nombre=j['posicion'])[0][0]
+
+    j.pop('equipo')
+    j.pop('posicion')
+    try:
+        db.jugadores.insert(j).execute()
+    except:
+        print "Fallo: %s" % j
+
+
