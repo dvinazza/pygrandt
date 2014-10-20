@@ -25,6 +25,7 @@ for j in jugadores:
     try:
         j_id = db.session.query(db.jugadores).filter_by(nombre=j['nombre'])[0][0]
     except:
+        print "No encontre a %s" % j['nombre']
         continue
 
     registro = {'jugador_id': j_id,
@@ -38,3 +39,4 @@ for j in jugadores:
 
 
 driver.close()
+display.stop()
